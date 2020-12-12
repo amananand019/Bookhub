@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.devil.premises.bookhub.R
 import com.devil.premises.bookhub.model.Book
 import com.mikhaellopez.circularimageview.CircularImageView
+import com.squareup.picasso.Picasso
 
 class DashboardRecyclerAdapter(val context: Context, val itemList: ArrayList<Book>): RecyclerView.Adapter<DashboardRecyclerAdapter.DashboardViewHolder>() {
 
@@ -23,10 +24,11 @@ class DashboardRecyclerAdapter(val context: Context, val itemList: ArrayList<Boo
         val book = itemList[position]
         holder.txtBookName.text = book.bookName
         holder.txtBookAuthor.text = book.bookAuthor
-        holder.txtBookPrice.text = book.bookCost
+        holder.txtBookPrice.text = book.bookPrice
         holder.txtBookRating.text = book.bookRating
         holder.txtBookRating.text = book.bookRating
-        holder.imgBookImage.setImageResource(book.bookImage)
+        //holder.imgBookImage.setImageResource(book.bookImage)
+        Picasso.get().load(book.bookImage).into(holder.imgBookImage)
 
         holder.rlContent.setOnClickListener {
             Toast.makeText(context, "Clicked on ${holder.txtBookName.text}", Toast.LENGTH_SHORT).show()
