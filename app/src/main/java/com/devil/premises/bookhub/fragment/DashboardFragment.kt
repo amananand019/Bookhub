@@ -2,25 +2,19 @@ package com.devil.premises.bookhub.fragment
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.devil.premises.bookhub.R
@@ -28,6 +22,9 @@ import com.devil.premises.bookhub.adapter.DashboardRecyclerAdapter
 import com.devil.premises.bookhub.model.Book
 import com.devil.premises.bookhub.util.ConnectionManager
 import org.json.JSONException
+import java.util.*
+import kotlin.Comparator
+import kotlin.collections.HashMap
 
 class DashboardFragment : Fragment() {
 
@@ -39,11 +36,22 @@ class DashboardFragment : Fragment() {
 
     val bookInfoList = arrayListOf<Book>()
 
+    var ratingComparator = Comparator<Book> { book1, book2 ->
+        if (book1.bookRating.compareTo(book2.bookRating, true) == 0) {
+            book1.bookName.compareTo(book2.bookName, true)
+        } else{
+            book1.bookRating.compareTo(book2.bookRating, true)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_dashboard, container, false)
+
+        //tell the compiler that it has a menu option
+        setHasOptionsMenu(true)
 
         recyclerDashboard = view.findViewById(R.id.recyclerDashboard)
         layoutManager = LinearLayoutManager(activity)
@@ -51,7 +59,6 @@ class DashboardFragment : Fragment() {
         progressBar = view.findViewById(R.id.progressBar)
 
         progressLayout.visibility = View.VISIBLE
-
 
         val queue = Volley.newRequestQueue(activity as Context)
         val url = "http://13.235.250.119/v1/book/fetch_books/"
@@ -102,11 +109,12 @@ class DashboardFragment : Fragment() {
 
                 }, Response.ErrorListener {
                     //Here we will handle the errors
-                    Toast.makeText(
-                        activity as Context,
-                        "Volley error occurred!!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (activity != null)
+                        Toast.makeText(
+                            activity as Context,
+                            "Volley error occurred!!!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                 }) {
                     override fun getHeaders(): MutableMap<String, String> {
                         val headers = HashMap<String, String>()
@@ -136,5 +144,22 @@ class DashboardFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater?.inflate(R.menu.menu_dashboard, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val id = item?.itemId
+        if (id == R.id.action_sort) {
+            Collections.sort(bookInfoList, ratingComparator)
+            bookInfoList.reverse()
+        }
+
+        recyclerAdapter.notifyDataSetChanged()
+
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -15,4 +15,5 @@
     <string name="recycler_view_main_text">Recycler View Main Text</string>
     <string name="name_of_the_author">Name of the Author</string>
     <string name="add_to_favourites">Add To Favourites</string>
+    <string name="action_sort">Sort</string>
 </resources>
